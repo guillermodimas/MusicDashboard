@@ -1,9 +1,59 @@
 ﻿@page "/"
+@inject InterfaceItunesAPIService _api
+@inject ISnackbar snackbar
 
-<PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+@if(musicResults != null)
+{
+    if(musicResults.resultCount == 0)
+    {
+        
+    }
+    else
+    {
+        
+    }
+}
+else
+{
+    <MudAlert Severity="Severity.Normal">Fetching your request...</MudAlert>
+    <MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudSkeleton Animation="Animation.Wave" Width="40%" />
+            <MudSkeleton Animation="Animation.Wave" Width="60%" />
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="250px" />
+    <MudCardContent>
+        <MudSkeleton Animation="Animation.Wave" />
+    </MudCardContent>
+    <MudCardActions>
+        <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="30px" Width="30px" Class="ml-2 mb-2" />
+        <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="30px" Width="30px" Class="ml-3 mb-2" />
+    </MudCardActions>
+</MudCard>
+}
+@code
+{
+    private ItunesMusicResultsModel? musicResults;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+           // musicResults = await _api.GetItunesMusicResult("asdasdasdasdsdfsdfsdrewrwersdfsdrwer");        
+        }
+        catch(Exception ex)
+        {
+            
+            #if(DEBUG)
+                snackbar.Add($"There was an issue fetching the ITunes data requested: {ex.Message} ", Severity.Warning);
+            #else
+                snackbar.Add($"There was an issue fetching the ITunes data requested", Severity.Warning);
+            #endif
+        }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+    }
+}
