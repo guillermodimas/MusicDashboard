@@ -47,6 +47,7 @@
             public string contentAdvisoryRating { get; set; }
             public int collectionArtistId { get; set; }
             public string collectionArtistName { get; set; }
+            public bool togglePlay { get; set; } = false; //added toggle field to keep track of active playback tracks
         }
 
     }

@@ -1,17 +1,65 @@
 ﻿@page "/"
 @inject InterfaceItunesAPIService _api
 @inject ISnackbar snackbar
-
+@inject IJSRuntime _jsRuntime;
 
 
 @if(musicResults != null)
 {
-    if(musicResults.resultCount == 0)
+if(musicResults.resultCount == 0)
     {
+        
         
     }
     else
     {
+       
+      
+  <MudGrid Justify="Justify.Center" Spacing="3">            
+            @foreach(var record in (musicResults.resultCount > 50 ? musicResults.results.Take(5) : musicResults.results.Take(50)))
+            {
+                
+                
+                 <MudContainer Style="max-width: 350px" Class="mt-3">
+                     <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                               <MudText><MudLink Href="@record.trackViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.h6">@record.trackName</MudLink></MudText>
+                               <MudText><MudLink Href="@record.artistViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.body2">Artist: @record.artistName</MudLink></MudText> 
+                               <MudText><MudLink Href="@record.artistViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.body2">Album: @record.collectionName</MudLink></MudText> 
+                            </CardHeaderContent>
+                             <CardHeaderActions>
+                              
+                                    
+                                 
+                                  
+                                       
+                                      <MudToggleIconButton Toggled="record.togglePlay" ToggledChanged="(x => OnToggledChanged(x, record.trackId.ToString()))" Icon="@Icons.Material.Filled.PlayCircle" Color="@Color.Primary" Size="Size.Large" Title="Press to Play" ToggledSize="Size.Large" ToggledIcon="@Icons.Material.Filled.PauseCircle" ToggledColor="@Color.Primary" ToggledTitle="Press to Pause"></MudToggleIconButton>
+                                  
+                                
+                                    
+                                
+                     <audio id="@record.trackId.ToString()" src="@record.previewUrl" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                    
+                    
+                        <MudCardContent Style="text-align: center">
+                               <MudImage Src="@record.artworkUrl100"  Elevation="25" Class="rounded-lg"/>
+                            
+                        </MudCardContent>
+           
+            
+                    </MudCard>
+                 </MudContainer>
+                       
+                
+              
+                
+
+            }
+            </MudGrid>
+       
         
     }
 }
@@ -38,22 +86,64 @@ else
 @code
 {
     private ItunesMusicResultsModel? musicResults;
+    
+    private string previousAudioElement;
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-           // musicResults = await _api.GetItunesMusicResult("asdasdasdasdsdfsdfsdrewrwersdfsdrwer");        
+            musicResults = await _api.GetItunesMusicResult("badbunny");        
         }
         catch(Exception ex)
         {
-            
+
             #if(DEBUG)
-                snackbar.Add($"There was an issue fetching the ITunes data requested: {ex.Message} ", Severity.Warning);
+    snackbar.Add($"There was an issue fetching the ITunes data requested: {ex.Message} ", Severity.Warning);
             #else
-                snackbar.Add($"There was an issue fetching the ITunes data requested", Severity.Warning);
+            snackbar.Add($"There was an issue fetching the ITunes data requested", Severity.Warning);
             #endif
         }
 
 
     }
+    public async Task OnToggledChanged(bool toggled, string audioElementID)
+    {
+        musicResults.results.Single(x => x.trackId == Convert.ToInt32(audioElementID)).togglePlay = !musicResults.results.Single(x => x.trackId == Convert.ToInt32(audioElementID)).togglePlay;
+
+        if(string.IsNullOrEmpty(previousAudioElement))
+        {
+            previousAudioElement = audioElementID;
+
+        }
+
+        if(toggled)
+        {
+
+            if(previousAudioElement != audioElementID)
+            {
+                await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
+                
+                musicResults.results.Single(x => x.trackId == Convert.ToInt32(previousAudioElement)).togglePlay =! toggled;
+
+            }
+
+            await _jsRuntime.InvokeAsync<string>("PlayAudio", audioElementID);
+            previousAudioElement = audioElementID;
+        }
+        else
+        {
+            await _jsRuntime.InvokeAsync<string>("PauseAudio", audioElementID);
+            if(previousAudioElement != audioElementID)
+            {
+                await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
+                
+                musicResults.results.Single(x => x.trackId == Convert.ToInt32(previousAudioElement)).togglePlay =! toggled;
+            }
+            previousAudioElement = audioElementID;
+        }
+   
+    }
+    
 }
+
