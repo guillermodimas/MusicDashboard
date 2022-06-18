@@ -17,7 +17,7 @@
         </MudSelect>
     </MudItem>
      <MudItem md="2" Class="d-flex align-content-center flex-wrap flex-grow-1 gap-4" >
-         <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.BarChart" Color="Color.Primary">Generate Histogram</MudButton>
+         <MudButton Variant="Variant.Filled" Disabled="@(musicResults?.resultCount == 0 ? true : false)" EndIcon="@Icons.Material.Filled.BarChart" Color="Color.Primary">Generate Histogram</MudButton>
 
     </MudItem>
 </MudGrid>
