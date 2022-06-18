@@ -1,4 +1,5 @@
 ﻿using MusicDashboard.Models.ITunesAPI;
+using System.Web;
 
 namespace MusicDashboard.Services
 {
@@ -16,7 +17,7 @@ namespace MusicDashboard.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync($"search?term={searchBy}");
+                var response = await _httpClient.GetAsync($"search?term={HttpUtility.UrlEncode(searchBy)}");
                 if(response.IsSuccessStatusCode)
                 {
                     if(response.StatusCode == System.Net.HttpStatusCode.NoContent)

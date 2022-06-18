@@ -5,7 +5,7 @@
 
         
         public int resultCount { get; set; }
-        public Result[] results { get; set; }
+        public List<Result>? results { get; set; }
         
 
         public class Result
