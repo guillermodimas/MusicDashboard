@@ -1,6 +1,4 @@
-﻿@page "/test"
-
-@using Syncfusion.Blazor
+﻿@using Syncfusion.Blazor
 @using Syncfusion.Blazor.Charts
 @using Syncfusion.Blazor.Grids
 
@@ -30,7 +28,7 @@
         <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
     </SfChart>
     
-    <MudButton OnClick="Export">Export Histogram To PDF</MudButton>
+    <MudButton OnClick="Export">Export Histogram</MudButton>
     <MudButton OnClick="ExportToExcel">Export Data To Excel</MudButton>
 
     <SfGrid ID="Grid" @ref="DefaultGrid" style="display: none"  DataSource="musicResults.results" AllowSorting="true" Toolbar="@(new List<string>() { "ExcelExport" })" AllowExcelExport="true" AllowPaging="true">
