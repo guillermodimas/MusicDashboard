@@ -48,6 +48,8 @@
             public int collectionArtistId { get; set; }
             public string collectionArtistName { get; set; }
             public bool togglePlay { get; set; } = false; //added toggle field to keep track of active playback tracks
+
+            public int releaseYear => releaseDate.Year; //used for histogram bucket value
         }
 
     }

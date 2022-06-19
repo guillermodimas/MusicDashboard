@@ -2,145 +2,158 @@
 @inject InterfaceItunesAPIService _api
 @inject ISnackbar snackbar
 @inject IJSRuntime _jsRuntime;
+@inject IDialogService dialogService
 @using System.Linq.Dynamic.Core
 
- <MudGrid Class="mb-4">
-     <MudItem md="6">
-        <MudTextField Def  @bind-Value="Search" Label="Search By Term" OnKeyUp="Enter" Immediate="true"  Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" OnAdornmentClick="() => SearchByKeyword()" Clearable="true" AdornmentColor="Color.Secondary" />
+<MudGrid Class="mb-4">
+    <MudItem md="8">
+        <MudTextField Def @bind-Value="Search" Label="Search By Term" OnKeyUp="Enter" Immediate="true" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" OnAdornmentClick="() => SearchByKeyword()" Clearable="true" AdornmentColor="Color.Secondary" />
     </MudItem>
-     <MudItem md="4" >
-        <MudSelect T="string" Label="Sort By" AnchorOrigin="Origin.BottomCenter" MultiSelection="false"  Variant="Variant.Outlined" Value="@SortBy" ValueChanged="SortByValueChanged">
+    <MudItem md="4">
+        <MudSelect T="string" Label="Sort By" AnchorOrigin="Origin.BottomCenter" MultiSelection="false" Variant="Variant.Outlined" Value="@SortBy" ValueChanged="SortByValueChanged">
             <MudSelectItem Value="@("trackName")">Song</MudSelectItem>
             <MudSelectItem Value="@("artistName")">Artist</MudSelectItem>
             <MudSelectItem Value="@("collectionName")">Album</MudSelectItem>
             <MudSelectItem Value="@("releaseDate")">Release Date</MudSelectItem>
         </MudSelect>
     </MudItem>
-     <MudItem md="2" Class="d-flex align-content-center flex-wrap flex-grow-1 gap-4" >
-         <MudButton Variant="Variant.Filled" Disabled="@(musicResults?.resultCount == 0 ? true : false)" EndIcon="@Icons.Material.Filled.BarChart" Color="Color.Primary">Generate Histogram</MudButton>
+    @* <MudItem md="4" Class="d-flex align-content-center flex-wrap flex-grow-1 gap-4" >
 
-    </MudItem>
+        <MudButton Variant="Variant.Filled" Disabled="@(musicResults?.resultCount == 0 ? true : false)" OnClick="OpenHistogramDialog" EndIcon="@Icons.Material.Filled.BarChart" Color="Color.Primary">Generate Histogram</MudButton>
+        </MudItem>*@
 </MudGrid>
-@if (musicResults != null)
-{
-    if (musicResults.resultCount == 0)
-    {
-        <MudAlert Severity="Severity.Info">No Results found.</MudAlert>
-    }
-    else
-    {
-
-
-        <MudGrid Spacing="3" Class="mb-4">
-            @foreach (var record in (musicResults.resultCount > 50 ? musicResults.results.Take(25) : musicResults.results))
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Results">
+        @if (musicResults != null)
+        {
+            if (musicResults.resultCount == 0)
+            {
+                <MudAlert Severity="Severity.Info">No Results found.</MudAlert>
+            }
+            else
             {
 
+
+                <MudGrid Spacing="3" Class="mb-4">
+                    @foreach (var record in (musicResults.resultCount > 50 ? musicResults.results.Take(25) : musicResults.results))
+                    {
+
+
+                        <MudContainer Style="max-width: 350px" Class="mt-3">
+                            <MudCard>
+                                <MudCardHeader>
+                                    <CardHeaderContent>
+                                        <MudText><MudLink Href="@record.trackViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.h6">@record.trackName</MudLink></MudText>
+                                        <MudText><MudLink Href="@record.artistViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.body2">Artist: @record.artistName</MudLink></MudText>
+                                        <MudText><MudLink Href="@record.artistViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.body2">Album: @record.collectionName</MudLink></MudText>
+                                    </CardHeaderContent>
+                                    <CardHeaderActions>
+
+
+
+
+
+                                        <MudToggleIconButton Toggled="record.togglePlay" ToggledChanged="(x => OnToggledChanged(x, record.trackId.ToString()))" Icon="@Icons.Material.Filled.PlayCircle" Color="@Color.Primary" Size="Size.Large" Title="Press to Play" ToggledSize="Size.Large" ToggledIcon="@Icons.Material.Filled.PauseCircle" ToggledColor="@Color.Primary" ToggledTitle="Press to Pause"></MudToggleIconButton>
+
+
+
+
+                                        <audio id="@record.trackId.ToString()" src="@record.previewUrl" />
+                                    </CardHeaderActions>
+                                </MudCardHeader>
+
+
+                                <MudCardContent Style="text-align: center">
+                                    <MudImage Src="@record.artworkUrl100" Elevation="25" Class="rounded-lg" />
+
+                                </MudCardContent>
+
+
+                            </MudCard>
+                        </MudContainer>
+
+
+
+
+
+                    }
+                </MudGrid>
+
+
+            }
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Normal">Fetching your request...</MudAlert>
+            <MudGrid>
 
                 <MudContainer Style="max-width: 350px" Class="mt-3">
                     <MudCard>
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText><MudLink Href="@record.trackViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.h6">@record.trackName</MudLink></MudText>
-                                <MudText><MudLink Href="@record.artistViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.body2">Artist: @record.artistName</MudLink></MudText>
-                                <MudText><MudLink Href="@record.artistViewUrl" Target="_Target" Color="Color.Inherit" Typo="Typo.body2">Album: @record.collectionName</MudLink></MudText>
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
                             </CardHeaderContent>
                             <CardHeaderActions>
-
-
-
-
-
-                                <MudToggleIconButton Toggled="record.togglePlay" ToggledChanged="(x => OnToggledChanged(x, record.trackId.ToString()))" Icon="@Icons.Material.Filled.PlayCircle" Color="@Color.Primary" Size="Size.Large" Title="Press to Play" ToggledSize="Size.Large" ToggledIcon="@Icons.Material.Filled.PauseCircle" ToggledColor="@Color.Primary" ToggledTitle="Press to Pause"></MudToggleIconButton>
-
-
-
-
-                                <audio id="@record.trackId.ToString()" src="@record.previewUrl" />
+                                <MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
                             </CardHeaderActions>
                         </MudCardHeader>
-
-
-                        <MudCardContent Style="text-align: center">
-                            <MudImage Src="@record.artworkUrl100" Elevation="25" Class="rounded-lg" />
-
-                        </MudCardContent>
-
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="100px" />
 
                     </MudCard>
                 </MudContainer>
+                <MudContainer Style="max-width: 350px" Class="mt-3">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="100px" />
 
+                    </MudCard>
+                </MudContainer>
+                <MudContainer Style="max-width: 350px" Class="mt-3">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                                <MudSkeleton Animation="Animation.Wave" Width="65%" />
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="100px" />
 
+                    </MudCard>
+                </MudContainer>
+            </MudGrid>
 
-
-
-            }
-        </MudGrid>
-
-
-    }
-}
-else
-{
-    <MudAlert Severity="Severity.Normal">Fetching your request...</MudAlert>
-    <MudGrid>
+        }
+    </MudTabPanel>
+    <MudTabPanel Text="Histogram" Disabled="@(musicResults?.resultCount == 0 ? true : false)">
+        @if (musicResults != null)
+        {
+            <HistogramPopup musicResults="@musicResults" />
+        }
         
-           <MudContainer Style="max-width: 350px" Class="mt-3">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                </CardHeaderContent>
-                <CardHeaderActions>
-                    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
-                </CardHeaderActions>
-            </MudCardHeader>
-            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="100px" />
-     
-        </MudCard>
-        </MudContainer>
-         <MudContainer Style="max-width: 350px" Class="mt-3">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                </CardHeaderContent>
-                <CardHeaderActions>
-                    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
-                </CardHeaderActions>
-            </MudCardHeader>
-            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="100px" />
-     
-        </MudCard>
-        </MudContainer>
-         <MudContainer Style="max-width: 350px" Class="mt-3">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                    <MudSkeleton Animation="Animation.Wave" Width="65%" />
-                </CardHeaderContent>
-                <CardHeaderActions>
-                    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
-                </CardHeaderActions>
-            </MudCardHeader>
-            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="100px" />
-     
-        </MudCard>
-        </MudContainer>
-    </MudGrid>
+    </MudTabPanel>
+</MudTabs>
 
-}
 @code
 {
-    private ItunesMusicResultsModel? musicResults;
+    private ItunesMusicResultsModel? musicResults { get; set; }
 
     private string previousAudioElement;
-    public string Search { get; set; } = "Metallica";
+    public string Search { get; set; } = "bad bunny";
     public string SortBy { get; set; } = "trackName";
     protected override async Task OnInitializedAsync()
     {
@@ -153,10 +166,10 @@ else
     {
         try
         {
-            if(!string.IsNullOrEmpty(previousAudioElement))
+            if (!string.IsNullOrEmpty(previousAudioElement))
             {
-                     await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
-                     previousAudioElement = null;
+                await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
+                previousAudioElement = null;
             }
 
             musicResults = null;
@@ -213,7 +226,7 @@ else
     }
     public async Task Enter(KeyboardEventArgs e)
     {
-        if (e.Code == "Enter" )
+        if (e.Code == "Enter")
         {
             await SearchByKeyword();
         }
@@ -224,6 +237,10 @@ else
         musicResults.results = musicResults.results.AsQueryable().OrderBy($"{SortBy} ASC").ToList();
         StateHasChanged();
     }
-  
+    private void OpenHistogramDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium };
+        dialogService.Show<HistogramPopup>("Generated Histogram", options);
+    }
 }
 

@@ -25,7 +25,9 @@ namespace MusicDashboard.Services
                         return default(ItunesMusicResultsModel);
                     }    
                     
-                    return await response.Content.ReadFromJsonAsync<ItunesMusicResultsModel>();
+                    var list = await response.Content.ReadFromJsonAsync<ItunesMusicResultsModel>();
+                    var test = list.results.OrderByDescending(x => x.releaseYear).ToList();
+                    return list;
                 }
                 else
                 {

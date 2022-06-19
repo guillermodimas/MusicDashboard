@@ -11,7 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddMudServices(); //Registering MudBlazor Component Library Service
-builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = true; }); //Register Syncfusion component used to render the Histogram
+builder.Services.AddSyncfusionBlazor(); //Register Syncfusion component used to render the Histogram
 
 //Register ItunesAPI along with a HTTPClient
 builder.Services.AddHttpClient<InterfaceItunesAPIService, ItunesAPIService>(client =>
