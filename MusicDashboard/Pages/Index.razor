@@ -153,6 +153,12 @@ else
     {
         try
         {
+            if(!string.IsNullOrEmpty(previousAudioElement))
+            {
+                     await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
+                     previousAudioElement = null;
+            }
+
             musicResults = null;
             musicResults = await _api.GetItunesMusicResult(Search);
         }
@@ -218,5 +224,6 @@ else
         musicResults.results = musicResults.results.AsQueryable().OrderBy($"{SortBy} ASC").ToList();
         StateHasChanged();
     }
+  
 }
 
