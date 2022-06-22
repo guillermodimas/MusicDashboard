@@ -1,6 +1,7 @@
 ﻿@using Syncfusion.Blazor
 @using Syncfusion.Blazor.Charts
 @using Syncfusion.Blazor.Grids
+@implements  IDisposable
 
 @if(musicResults.resultCount >= 1)
 {
@@ -18,9 +19,6 @@
         <ChartSeriesCollection >
             <ChartSeries DataSource="@musicResults.results" YName="releaseYear" Type="ChartSeriesType.Histogram" BinInterval="2" ShowNormalDistribution="true">
                 <ChartMarker Visible="true" Height="10" Width="10">
-                   @* <ChartDataLabel Visible="true" Position="LabelPosition.Top">
-                        <ChartDataLabelFont Color="#ffffff" FontWeight="600"></ChartDataLabelFont>
-                    </ChartDataLabel>*@
                 </ChartMarker>
             </ChartSeries>
         </ChartSeriesCollection>
@@ -57,13 +55,18 @@
         await this.DefaultGrid.ExcelExport();
     }
 
-        
-    
-     private async Task Export(MouseEventArgs args)
+
+
+    private async Task Export(MouseEventArgs args)
     {
         await ChartObj.ExportAsync(Syncfusion.Blazor.Charts.ExportType.PNG, "pdfHistogram");
     }
 
+    void IDisposable.Dispose()
+    {
+        ChartObj.Dispose();
+        musicResults = null;
+    }
 
    
 }

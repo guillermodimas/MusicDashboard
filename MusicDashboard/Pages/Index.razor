@@ -17,10 +17,6 @@
             <MudSelectItem Value="@("releaseDate")">Release Date</MudSelectItem>
         </MudSelect>
     </MudItem>
-    @* <MudItem md="4" Class="d-flex align-content-center flex-wrap flex-grow-1 gap-4" >
-
-        <MudButton Variant="Variant.Filled" Disabled="@(musicResults?.resultCount == 0 ? true : false)" OnClick="OpenHistogramDialog" EndIcon="@Icons.Material.Filled.BarChart" Color="Color.Primary">Generate Histogram</MudButton>
-        </MudItem>*@
 </MudGrid>
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
     <MudTabPanel Text="Results">
@@ -144,7 +140,7 @@
         {
             <HistogramPopup musicResults="@musicResults" />
         }
-        
+
     </MudTabPanel>
 </MudTabs>
 
@@ -168,8 +164,20 @@
         {
             if (!string.IsNullOrEmpty(previousAudioElement))
             {
-                await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
-                previousAudioElement = null;
+                try
+                {
+                    await _jsRuntime.InvokeAsync<string>("PauseAudio", previousAudioElement);
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    previousAudioElement = null;
+                }
+
+
             }
 
             musicResults = null;
